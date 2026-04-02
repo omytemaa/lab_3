@@ -84,7 +84,7 @@ jobs:
           path: lab2-var11-1.0.0.deb
 
   docker:
-    name: 🐳 Docker Build & Push
+    name: 🐳 Docker Build (локально)
     needs: package
     runs-on: ubuntu-latest
     steps:
@@ -99,19 +99,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push Docker image
+      - name: Build Docker image locally
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: true
-          tags: ghcr.io/${{ github.repository }}:latest
+          load: true # загружает образ локально в Docker
+          tags: lab2-local:latest
 
   release:
     name: 🚀 Release
