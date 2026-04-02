@@ -9,6 +9,7 @@ PROGRAM="./src/lab2"
 PASSED=0
 FAILED=0
 
+
 run_test() {
     local test_name="$1"
     local input="$2"
@@ -16,7 +17,7 @@ run_test() {
     
     echo "Тест: $test_name"
     
-    output=$(echo -e "$input" | $PROGRAM 2>&1)
+    output=$(echo -e "$input" | $PROGRAM 2>&1 || true)
     
     echo "   Вывод программы:"
     echo "$output" | sed 's/^/   /'
@@ -31,6 +32,7 @@ run_test() {
     fi
     echo ""
 }
+
 
 # Тесты
 
