@@ -1,24 +1,16 @@
 FROM ubuntu:22.04
 
-# Устанавливаем необходимые пакеты
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Устанавливаем необходимые библиотеки (если нужны)
 RUN apt-get update && apt-get install -y \
-    wget \
+    libstdc++6 \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+# Копируем и устанавливаем .deb пакет (маска lab3-*.deb)
+COPY lab3-*.deb /tmp/lab3.deb
+RUN dpkg -i /tmp/lab3.deb || apt-get install -fy
 
-# Копируем deb-пакет и скрипт входа
-COPY lab2-var11-*.deb /app/
-COPY docker-entrypoint.sh /app/
-
-# Устанавливаем пакет
-RUN dpkg -i /app/lab2-var11-*.deb || apt-get install -f -y
-
-# Делаем скрипт исполняемым
-RUN chmod +x /app/docker-entrypoint.sh
-
-# Проверяем установку
-RUN which lab2
-
-# Используем скрипт как точку входа
-ENTRYPOINT ["/app/docker-entrypoint.sh"]
+# Запускаем программу lab3
+ENTRYPOINT ["/usr/local/bin/lab3"]
+CMD ["--test"]
