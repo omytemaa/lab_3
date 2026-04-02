@@ -2,11 +2,13 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, master]
+    branches: [ main, master ]
+    tags:
+      - 'v*'  # пуш тега запускает релиз
   pull_request:
-    branches: [main, master]
+    branches: [ main, master ]
   release:
-    types: [created]
+    types: [ created ]
 
 jobs:
   build:
@@ -14,18 +16,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y g++ make dpkg-dev
-
-      - name: Make scripts executable
-        run: chmod +x cicd/*.sh
-
-      - name: Run build
-        run: ./cicd/build.sh
-
-      - name: Upload binary
-        uses: actions/upload-artifact@v4
+      - run: sudo apt-get update && sudo apt-get install -y g++ make dpkg-dev
+      - run: chmod +x cicd/*.sh
+      - run: ./cicd/build.sh
+      - uses: actions/upload-artifact@v4
         with:
           name: lab2-binary
           path: src/lab2
@@ -36,21 +30,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Make scripts executable
-        run: chmod +x cicd/*.sh
-
-      - name: Download binary
-        uses: actions/download-artifact@v4
+      - run: chmod +x cicd/*.sh
+      - uses: actions/download-artifact@v4
         with:
           name: lab2-binary
           path: src/
-
-      - name: Make binary executable
-        run: chmod +x src/lab2
-
-      - name: Run tests
-        run: ./cicd/test.sh
+      - run: chmod +x src/lab2
+      - run: ./cicd/test.sh
 
   package:
     name: 📦 Package
@@ -58,72 +44,55 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Make scripts executable
-        run: chmod +x cicd/*.sh
-
-      - name: Download binary
-        uses: actions/download-artifact@v4
+      - run: chmod +x cicd/*.sh
+      - uses: actions/download-artifact@v4
         with:
           name: lab2-binary
           path: src/
-
-      - name: Make binary executable
-        run: chmod +x src/lab2
-
-      - name: Install packaging tools
-        run: sudo apt-get install -y dpkg-dev
-
-      - name: Build deb package
-        run: ./cicd/package.sh
-
-      - name: Upload deb package
-        uses: actions/upload-artifact@v4
+      - run: chmod +x src/lab2
+      - run: ./cicd/package.sh
+      - uses: actions/upload-artifact@v4
         with:
           name: deb-package
           path: lab2-var11-1.0.0.deb
 
   docker:
-    name: 🐳 Docker Build (локально)
+    name: 🐳 Docker Build
     needs: package
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Download deb package
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: deb-package
           path: .
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build Docker image locally
-        uses: docker/build-push-action@v5
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v5
         with:
           context: .
-          load: true # образ останется локально
+          load: true
           tags: lab2-local:latest
-
-      - name: Check Docker image
-        run: docker images | grep lab2-local
+      - run: docker images | grep lab2-local
 
   release:
     name: 🚀 Release
     needs: package
     runs-on: ubuntu-latest
+    if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/checkout@v4
 
-      # Скачиваем пакет из package job
-      - name: Download deb package
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: deb-package
           path: .
 
-      - name: Show package
-        run: |
-          echo "🎉 Релиз job сработала!"
-          ls -lh ./lab2-var11-1.0.0.deb
+      - name: Upload .deb to GitHub Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}  # используем PAT
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./lab2-var11-1.0.0.deb
+          asset_name: lab2-var11-1.0.0.deb
+          asset_content_type: application/vnd.debian.binary-package
