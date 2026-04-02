@@ -87,7 +87,6 @@ jobs:
         with:
           name: deb-package
           path: .
-
       - name: Show package
         run: |
           echo "🎉 Релиз job сработала!"
