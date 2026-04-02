@@ -114,5 +114,16 @@ jobs:
     needs: package
     runs-on: ubuntu-latest
     steps:
-      - run: echo "🎉 Релиз job сработала! Можно делать любые действия здесь."
-      - run: ls -lh lab2-var11-1.0.0.deb
+      - uses: actions/checkout@v4
+
+      # Скачиваем .deb из package job
+      - name: Download deb package
+        uses: actions/download-artifact@v4
+        with:
+          name: deb-package
+          path: .
+
+      - name: Release job ran
+        run: |
+          echo "🎉 Релиз job сработала!"
+          ls -lh ./lab2-var11-1.0.0.deb
