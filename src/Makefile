@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -Wall -Wextra -O2
-TARGET = lab1
+TARGET = lab2
 SRCDIR = ./
 SOURCES = $(SRCDIR)/main.cpp
 
