@@ -1,29 +1,35 @@
 #!/bin/bash
 set -e
 
+echo "==================================="
 echo "📦 Создаю .deb пакет..."
+echo "==================================="
 
-VERSION="1.0.0"
+# Проверка бинарника
+if [ ! -f src/lab2 ]; then
+    echo "❌ Ошибка: src/lab2 не найден!"
+    exit 1
+fi
 
-mkdir -p deb_root/DEBIAN
-mkdir -p deb_root/usr/local/bin
+# Создаем структуру пакета
+rm -rf build
+mkdir -p build/usr/local/bin
+mkdir -p build/DEBIAN
 
-# Копируем БИНАРНИК lab3, который создаётся в build.sh
-cp src/lab3 deb_root/usr/local/bin/
+# Копируем бинарник
+cp src/lab2 build/usr/local/bin/
 
-cat > deb_root/DEBIAN/control << EOF
-Package: lab3
-Version: ${VERSION}
-Section: devel
-Priority: optional
-Architecture: amd64
-Maintainer: Your Name <your.email@example.com>
-Description: Lab3 program
- Finds max element missing from array
-EOF
+# Копируем control файл
+cp DEBIAN/control build/DEBIAN/
 
-# Итоговый файл тоже называем lab3-1.0.0.deb
-dpkg-deb --build deb_root lab3-${VERSION}.deb
+# Права
+chmod 755 build/usr/local/bin/lab2
 
-echo "✅ Пакет создан: lab3-${VERSION}.deb"
-ls -la *.deb
+# Сборка пакета
+dpkg-deb --build build
+
+# Переименование
+PACKAGE_NAME="lab2-var11-1.0.0.deb"
+mv build.deb $PACKAGE_NAME
+
+echo "✅ Пакет создан: $PACKAGE_NAME"
