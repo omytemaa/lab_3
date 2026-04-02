@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y g++ make dpkg-dev
 
-      - name: Give execute permission to scripts
+      - name: Make scripts executable
         run: chmod +x cicd/*.sh
 
       - name: Run build
@@ -37,7 +37,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Give execute permission
+      - name: Make scripts executable
         run: chmod +x cicd/*.sh
 
       - name: Download binary
@@ -59,7 +59,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Give execute permission
+      - name: Make scripts executable
         run: chmod +x cicd/*.sh
 
       - name: Download binary
@@ -103,8 +103,11 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          load: true # загружает образ локально в Docker
+          load: true # образ останется локально
           tags: lab2-local:latest
+
+      - name: Check Docker image
+        run: docker images | grep lab2-local
 
   release:
     name: 🚀 Release
