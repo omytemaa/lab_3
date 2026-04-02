@@ -1,12 +1,7 @@
 Package: lab2-var11
 Version: 1.0.0
-Section: utils
+Section: base
 Priority: optional
 Architecture: amd64
-Maintainer: Evgeniy <Shy.zhen@yandex.com>
-Description: Программа для варианта 1 лабораторной работы 2
- Фибоначи
- .
- Разработано в рамках курса "Технологии распространения, 
- развертывания и сопровождения ПО".
-Build-Depends: g++, make
+Maintainer: Student
+Description: Fibonacci calculator

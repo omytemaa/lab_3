@@ -1,8 +1,7 @@
 CC = g++
 CFLAGS = -Wall -Wextra -O2
 TARGET = lab2
-SRCDIR = ./
-SOURCES = $(SRCDIR)/main.cpp
+SOURCES = main.cpp
 
 all: $(TARGET)
 
@@ -12,11 +11,4 @@ $(TARGET): $(SOURCES)
 clean:
 	rm -f $(TARGET)
 
-install: $(TARGET)
-	install -d $(DESTDIR)/usr/bin
-	install -m 755 $(TARGET) $(DESTDIR)/usr/bin/
-
-uninstall:
-	rm -f $(DESTDIR)/usr/bin/$(TARGET)
-
-.PHONY: all clean install uninstall
+.PHONY: all clean
