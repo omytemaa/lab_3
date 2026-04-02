@@ -4,7 +4,7 @@ set -e  # Остановка при любой ошибке
 echo "🔨 Компилирую программу из src/main.cpp..."
 
 # Проверяем, что файл существует
-if [ ! -f "src/main.cpp" ]; then
+if [ ! -f "/src/main.cpp" ]; then
     echo "❌ Ошибка: src/main.cpp не найден!"
     exit 1
 fi
