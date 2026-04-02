@@ -111,23 +111,8 @@ jobs:
 
   release:
     name: 🚀 Release
-    needs: [package, docker]
-    if: github.event_name == 'release'
+    needs: package
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Download deb package
-        uses: actions/download-artifact@v4
-        with:
-          name: deb-package
-
-      - name: Upload release asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./lab2-var11-1.0.0.deb
-          asset_name: lab2-var11-1.0.0.deb
-          asset_content_type: application/vnd.debian.binary-package
+      - run: echo "🎉 Релиз job сработала! Можно делать любые действия здесь."
+      - run: ls -lh lab2-var11-1.0.0.deb
